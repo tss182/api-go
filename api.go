@@ -106,41 +106,44 @@ func (api *Api) jsonProccess() error {
 func (api *Api) urlEncodeProccess() error {
 	var err error
 	param := url.Values{}
-	data, ok := api.Body.(map[string]interface{})
-	if !ok {
-		return errors.New("body must be map[string]interface{}")
-	}
-	for i, dt := range data {
-		switch v := dt.(type) {
-		case string:
-			param.Add(i, v)
-		case []string:
-			for _, v2 := range v {
-				param.Add(i+"[]", v2)
-			}
-		case int, int8, int16, int32, int64:
-			reflectValue := reflect.ValueOf(v)
-			param.Add(i, strconv.Itoa(int(reflectValue.Int())))
-		case []int:
-			for _, v2 := range v {
-				param.Add(i+"[]", strconv.Itoa(v2))
-			}
-		case uint, uint8, uint16, uint32, uint64:
-			reflectValue := reflect.ValueOf(v)
-			param.Add(i, strconv.Itoa(int(reflectValue.Uint())))
-		case []uint:
-			for _, v2 := range v {
-				param.Add(i+"[]", strconv.Itoa(int(v2)))
-			}
-		case map[string]string:
-			for i2, v2 := range v {
-				param.Add(i+"["+i2+"]", v2)
-			}
+	if api.Body != nil {
+		data, ok := api.Body.(map[string]interface{})
+		if !ok {
+			return errors.New("body must be map[string]interface{}")
+		}
+		for i, dt := range data {
+			switch v := dt.(type) {
+			case string:
+				param.Add(i, v)
+			case []string:
+				for _, v2 := range v {
+					param.Add(i+"[]", v2)
+				}
+			case int, int8, int16, int32, int64:
+				reflectValue := reflect.ValueOf(v)
+				param.Add(i, strconv.Itoa(int(reflectValue.Int())))
+			case []int:
+				for _, v2 := range v {
+					param.Add(i+"[]", strconv.Itoa(v2))
+				}
+			case uint, uint8, uint16, uint32, uint64:
+				reflectValue := reflect.ValueOf(v)
+				param.Add(i, strconv.Itoa(int(reflectValue.Uint())))
+			case []uint:
+				for _, v2 := range v {
+					param.Add(i+"[]", strconv.Itoa(int(v2)))
+				}
+			case map[string]string:
+				for i2, v2 := range v {
+					param.Add(i+"["+i2+"]", v2)
+				}
 
-		default:
-			return errors.New(reflect.TypeOf(v).String() + " doesn't support")
+			default:
+				return errors.New(reflect.TypeOf(v).String() + " doesn't support")
+			}
 		}
 	}
+
 	payload := strings.NewReader(param.Encode())
 	api.req, err = http.NewRequest(api.Method, api.Url, payload)
 	return err
@@ -150,51 +153,53 @@ func (api *Api) multipartProccess() error {
 	var err error
 	payload := &bytes.Buffer{}
 	param := multipart.NewWriter(payload)
-	data, ok := api.Body.(map[string]interface{})
-	if !ok {
-		return errors.New("body must be map[string]interface{}")
-	}
-	for i, dt := range data {
-		switch v := dt.(type) {
-		case string:
-			_ = param.WriteField(i, v)
-		case []string:
-			for _, v2 := range v {
-				_ = param.WriteField(i+"[]", v2)
-			}
-		case int, int8, int16, int32, int64:
-			reflectValue := reflect.ValueOf(v)
-			_ = param.WriteField(i, strconv.Itoa(int(reflectValue.Int())))
-		case []int:
-			for _, v2 := range v {
-				_ = param.WriteField(i+"[]", strconv.Itoa(v2))
-			}
-		case uint, uint8, uint16, uint32, uint64:
-			reflectValue := reflect.ValueOf(v)
-			_ = param.WriteField(i, strconv.Itoa(int(reflectValue.Uint())))
-		case []uint:
-			for _, v2 := range v {
-				_ = param.WriteField(i+"[]", strconv.Itoa(int(v2)))
-			}
-		case map[string]string:
-			for i2, v2 := range v {
-				_ = param.WriteField(i+"["+i2+"]", v2)
-			}
-		case *multipart.FileHeader:
-			file, _ := v.Open()
-			write, _ := param.CreateFormFile(i, v.Filename)
-			_, _ = io.Copy(write, file)
-			_ = file.Close()
-		case []*multipart.FileHeader:
-			for _, v2 := range v {
-				file, _ := v2.Open()
-				f, _ := param.CreateFormFile(i+"[]", v2.Filename)
-				_, _ = io.Copy(f, file)
+	if api.Body != nil {
+		data, ok := api.Body.(map[string]interface{})
+		if !ok {
+			return errors.New("body must be map[string]interface{}")
+		}
+		for i, dt := range data {
+			switch v := dt.(type) {
+			case string:
+				_ = param.WriteField(i, v)
+			case []string:
+				for _, v2 := range v {
+					_ = param.WriteField(i+"[]", v2)
+				}
+			case int, int8, int16, int32, int64:
+				reflectValue := reflect.ValueOf(v)
+				_ = param.WriteField(i, strconv.Itoa(int(reflectValue.Int())))
+			case []int:
+				for _, v2 := range v {
+					_ = param.WriteField(i+"[]", strconv.Itoa(v2))
+				}
+			case uint, uint8, uint16, uint32, uint64:
+				reflectValue := reflect.ValueOf(v)
+				_ = param.WriteField(i, strconv.Itoa(int(reflectValue.Uint())))
+			case []uint:
+				for _, v2 := range v {
+					_ = param.WriteField(i+"[]", strconv.Itoa(int(v2)))
+				}
+			case map[string]string:
+				for i2, v2 := range v {
+					_ = param.WriteField(i+"["+i2+"]", v2)
+				}
+			case *multipart.FileHeader:
+				file, _ := v.Open()
+				write, _ := param.CreateFormFile(i, v.Filename)
+				_, _ = io.Copy(write, file)
 				_ = file.Close()
-			}
+			case []*multipart.FileHeader:
+				for _, v2 := range v {
+					file, _ := v2.Open()
+					f, _ := param.CreateFormFile(i+"[]", v2.Filename)
+					_, _ = io.Copy(f, file)
+					_ = file.Close()
+				}
 
-		default:
-			return errors.New(reflect.TypeOf(v).String() + " doesn't support")
+			default:
+				return errors.New(reflect.TypeOf(v).String() + " doesn't support")
+			}
 		}
 	}
 	err = param.Close()
