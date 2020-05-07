@@ -37,7 +37,7 @@ type Api struct {
 	Password    string
 	BasicAuth   bool
 	result      string
-	Status      string
+	Status      int
 	req         *http.Request
 }
 
@@ -88,7 +88,7 @@ func (api *Api) Do() error {
 		return err
 	}
 	api.result = string(body)
-	api.Status = strings.Split(resp.Status, " ")[0]
+	api.Status, _ = strconv.Atoi(strings.Split(resp.Status, " ")[0])
 	return nil
 
 }

@@ -60,6 +60,9 @@
     
     	//print result
     	fmt.Println(result)
+    	
+    	//print header respon code
+    	fmt.Println(api.Status)
     }
 
 
