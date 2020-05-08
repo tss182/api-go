@@ -32,7 +32,6 @@ type Api struct {
 	ContentType string
 	Method      string
 	Body        interface{}
-	Header      map[string]string
 	Username    string
 	Password    string
 	BasicAuth   bool
@@ -45,6 +44,9 @@ func (api *Api) Do() error {
 	if api.Url == "" || api.Method == "" || api.ContentType == "" {
 		return errors.New("url,method and content type is required")
 	}
+	//set conten type
+	api.req.Header.Set("Content-Type", api.ContentType)
+
 	//method check
 	switch api.Method {
 	case MethodGET, MethodPOST, MethodPUT, MethodPATCH, MethodDELETE:
@@ -73,10 +75,7 @@ func (api *Api) Do() error {
 	if api.BasicAuth {
 		api.req.SetBasicAuth(api.Username, api.Password)
 	}
-	//set header
-	for i, v := range api.Header {
-		api.req.Header.Set(i, v)
-	}
+
 	client := &http.Client{}
 	resp, err := client.Do(api.req)
 	if err != nil {
@@ -91,6 +90,10 @@ func (api *Api) Do() error {
 	api.Status, _ = strconv.Atoi(strings.Split(resp.Status, " ")[0])
 	return nil
 
+}
+
+func (api *Api) HeaderAdd(key, value string) {
+	api.req.Header.Set(key, value)
 }
 
 func (api *Api) jsonProccess() error {
@@ -207,6 +210,7 @@ func (api *Api) multipartProccess() error {
 		return err
 	}
 
+	api.req.Header.Set("Content-Type", param.FormDataContentType())
 	api.req, err = http.NewRequest(api.Method, api.Url, payload)
 	return err
 }

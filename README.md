@@ -19,7 +19,7 @@
     	apiCfg.ContentType = api.TypeUrlEncode
     
     	//set Method
-    	apiCfg.Method = api.MethodGET
+        apiCfg.Method = api.MethodGET
     
     	//Set Body
     	/*apiCfg.Body = map[string]interface{}{
@@ -29,9 +29,8 @@
     	// Content Type api.TypeJson in body can input struct with json flag
     
     	//Set Header
-    	/*apiCfg.Data = map[string]interface{}{
-    	    "api-key": "1231231231111",
-    	}*/
+        //apiCfg.HeaderAdd("api-key","23423234")
+        //apiCfg.HeaderAdd("time",time.Now().String())
     
     	//Proccess
     	err := apiCfg.Do()
