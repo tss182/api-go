@@ -31,6 +31,7 @@ type Api struct {
 	Url         string
 	ContentType string
 	Method      string
+	header      map[string]string
 	Body        interface{}
 	Username    string
 	Password    string
@@ -44,8 +45,6 @@ func (api *Api) Do() error {
 	if api.Url == "" || api.Method == "" || api.ContentType == "" {
 		return errors.New("url,method and content type is required")
 	}
-	//set conten type
-	api.req.Header.Set("Content-Type", api.ContentType)
 
 	//method check
 	switch api.Method {
@@ -67,6 +66,13 @@ func (api *Api) Do() error {
 	default:
 		err = errors.New(api.ContentType + " doesn't support")
 	}
+	//set conten type
+	if api.ContentType != TypeMultipart {
+		api.req.Header.Set("Content-Type", api.ContentType)
+	}
+
+	//set header
+
 	if err != nil {
 		return err
 	}
@@ -74,6 +80,10 @@ func (api *Api) Do() error {
 	//set basic auth
 	if api.BasicAuth {
 		api.req.SetBasicAuth(api.Username, api.Password)
+	}
+
+	for i, v := range api.header {
+		api.req.Header.Set(i, v)
 	}
 
 	client := &http.Client{}
@@ -93,7 +103,10 @@ func (api *Api) Do() error {
 }
 
 func (api *Api) HeaderAdd(key, value string) {
-	api.req.Header.Set(key, value)
+	if api.header == nil {
+		api.header = map[string]string{}
+	}
+	api.header[key] = value
 }
 
 func (api *Api) jsonProccess() error {
