@@ -120,14 +120,12 @@ func (api *Api) jsonProccess() error {
 	if err != nil {
 		return err
 	}
-	var reader *strings.Reader
 	if api.Body == "" {
-		reader = strings.NewReader("")
+		api.req, err = http.NewRequest(api.Method, api.Url, nil)
 	} else {
-		reader = strings.NewReader(string(r))
+		reader := strings.NewReader(string(r))
+		api.req, err = http.NewRequest(api.Method, api.Url, reader)
 	}
-	reader = strings.NewReader(string(r))
-	api.req, err = http.NewRequest(api.Method, api.Url, reader)
 	return err
 }
 
