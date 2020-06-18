@@ -255,3 +255,7 @@ func (api *Api) GetXml(data interface{}) error {
 func (api *Api) GetRaw() string {
 	return api.result
 }
+
+func (api *Api) GetHeader() map[string]string {
+	return api.header
+}
