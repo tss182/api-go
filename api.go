@@ -33,6 +33,7 @@ type Api struct {
 	Method      string
 	header      map[string]string
 	Body        interface{}
+	bodyRaw     interface{}
 	Username    string
 	Password    string
 	BasicAuth   bool
@@ -99,6 +100,7 @@ func (api *Api) Do() error {
 	api.Status, _ = strconv.Atoi(strings.Split(resp.Status, " ")[0])
 
 	//clear
+	api.bodyRaw = api.Body
 	api.header = nil
 	api.Body = nil
 
@@ -257,4 +259,8 @@ func (api *Api) GetRaw() string {
 
 func (api *Api) GetHeader() http.Header {
 	return api.req.Header
+}
+
+func (api *Api) GetBody() interface{} {
+	return api.bodyRaw
 }
