@@ -71,8 +71,6 @@ func (api *Api) Do() error {
 		api.req.Header.Set("Content-Type", api.ContentType)
 	}
 
-	//set header
-
 	if err != nil {
 		return err
 	}
@@ -82,6 +80,7 @@ func (api *Api) Do() error {
 		api.req.SetBasicAuth(api.Username, api.Password)
 	}
 
+	//set header
 	for i, v := range api.header {
 		api.req.Header.Set(i, v)
 	}
@@ -256,6 +255,6 @@ func (api *Api) GetRaw() string {
 	return api.result
 }
 
-func (api *Api) GetHeader() map[string]string {
-	return api.header
+func (api *Api) GetHeader() http.Header {
+	return api.req.Header
 }
