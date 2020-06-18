@@ -98,6 +98,11 @@ func (api *Api) Do() error {
 	}
 	api.result = string(body)
 	api.Status, _ = strconv.Atoi(strings.Split(resp.Status, " ")[0])
+
+	//clear
+	api.header = nil
+	api.Body = nil
+
 	return nil
 
 }
