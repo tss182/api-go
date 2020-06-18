@@ -261,6 +261,10 @@ func (api *Api) GetRaw() string {
 	return api.result
 }
 
+func (api *Api) GetRequest() *http.Request {
+	return api.req
+}
+
 func (api *Api) GetHeader() http.Header {
 	return api.req.Header
 }
