@@ -236,8 +236,9 @@ func (api *Api) multipartProccess() error {
 		return err
 	}
 
-	api.req.Header.Set("Content-Type", param.FormDataContentType())
 	api.req, err = http.NewRequest(api.Method, api.Url, payload)
+	api.req.Header.Set("Content-Type", param.FormDataContentType())
+
 	return err
 }
 
