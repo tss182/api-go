@@ -59,11 +59,11 @@ func (api *Api) Do() error {
 	//contentType
 	switch api.ContentType {
 	case TypeJson:
-		err = api.jsonProccess()
+		err = api.jsonProcess()
 	case TypeUrlEncode:
-		err = api.urlEncodeProccess()
+		err = api.urlEncodeProcess()
 	case TypeMultipart:
-		err = api.multipartProccess()
+		err = api.multipartProcess()
 	default:
 		err = errors.New(api.ContentType + " doesn't support")
 	}
@@ -115,7 +115,7 @@ func (api *Api) HeaderAdd(key, value string) {
 	api.header[key] = value
 }
 
-func (api *Api) jsonProccess() error {
+func (api *Api) jsonProcess() error {
 	r, err := json.Marshal(api.Body)
 	if err != nil {
 		return err
@@ -129,7 +129,7 @@ func (api *Api) jsonProccess() error {
 	return err
 }
 
-func (api *Api) urlEncodeProccess() error {
+func (api *Api) urlEncodeProcess() error {
 	var err error
 	param := url.Values{}
 	if api.Body != nil {
@@ -171,14 +171,14 @@ func (api *Api) urlEncodeProccess() error {
 	}
 
 	payload := strings.NewReader(param.Encode())
-	if api.Method == MethodGET {
+	if api.Method == MethodGET && api.Body != nil {
 		api.Url += "?" + param.Encode()
 	}
 	api.req, err = http.NewRequest(api.Method, api.Url, payload)
 	return err
 }
 
-func (api *Api) multipartProccess() error {
+func (api *Api) multipartProcess() error {
 	var err error
 	payload := &bytes.Buffer{}
 	param := multipart.NewWriter(payload)
