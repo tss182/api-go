@@ -185,7 +185,7 @@ func (api *Api) urlEncodeProcess() error {
 		}
 	}
 
-	if api.Method == MethodGET && api.Body != nil {
+	if api.Method == MethodGET {
 		api.Url += "?" + param.Encode()
 		api.req, err = http.NewRequest(api.Method, api.Url, nil)
 	} else {
