@@ -140,8 +140,14 @@ func (api *Api) urlEncodeProcess() error {
 		for i, dt := range data {
 			switch v := dt.(type) {
 			case string:
+				if v == "" {
+					continue
+				}
 				param.Add(i, v)
 			case []string:
+				if len(v) == 0 {
+					continue
+				}
 				for _, v2 := range v {
 					param.Add(i+"[]", v2)
 				}
@@ -149,6 +155,9 @@ func (api *Api) urlEncodeProcess() error {
 				reflectValue := reflect.ValueOf(v)
 				param.Add(i, strconv.Itoa(int(reflectValue.Int())))
 			case []int:
+				if len(v) == 0 {
+					continue
+				}
 				for _, v2 := range v {
 					param.Add(i+"[]", strconv.Itoa(v2))
 				}
@@ -156,10 +165,16 @@ func (api *Api) urlEncodeProcess() error {
 				reflectValue := reflect.ValueOf(v)
 				param.Add(i, strconv.Itoa(int(reflectValue.Uint())))
 			case []uint:
+				if len(v) == 0 {
+					continue
+				}
 				for _, v2 := range v {
 					param.Add(i+"[]", strconv.Itoa(int(v2)))
 				}
 			case map[string]string:
+				if len(v) == 0 {
+					continue
+				}
 				for i2, v2 := range v {
 					param.Add(i+"["+i2+"]", v2)
 				}
