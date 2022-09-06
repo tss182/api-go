@@ -6,7 +6,6 @@ import (
 	"encoding/xml"
 	"errors"
 	"io"
-	"io/ioutil"
 	"mime/multipart"
 	"net/http"
 	"net/url"
@@ -67,7 +66,7 @@ func (api *Api) Do() error {
 	default:
 		err = errors.New(api.ContentType + " doesn't support")
 	}
-	//set conten type
+	//set content type
 	if api.ContentType != TypeMultipart {
 		api.req.Header.Set("Content-Type", api.ContentType)
 	}
@@ -91,8 +90,10 @@ func (api *Api) Do() error {
 	if err != nil {
 		return err
 	}
-	defer resp.Body.Close()
-	body, err := ioutil.ReadAll(resp.Body)
+	defer func() {
+		_ = resp.Body.Close()
+	}()
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return err
 	}
