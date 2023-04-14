@@ -18,7 +18,7 @@ const (
 	TypeJson      = "application/json"
 	TypeUrlEncode = "application/x-www-form-urlencoded"
 	TypeMultipart = "multipart/form-data"
-	TypeText = "text/plain"
+	TypeText      = "text/plain"
 
 	MethodGET    = "GET"
 	MethodPOST   = "POST"
@@ -265,10 +265,11 @@ func (api *Api) multipartProcess() error {
 }
 
 func (api *Api) textProcess() error {
+	var err error
 	if api.Body == nil {
 		api.req, err = http.NewRequest(api.Method, api.Url, nil)
 	} else {
-		reader := strings.NewReader(api.Body)
+		reader := strings.NewReader(api.Body.(string))
 		api.req, err = http.NewRequest(api.Method, api.Url, reader)
 	}
 	return err
