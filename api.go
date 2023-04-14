@@ -18,6 +18,7 @@ const (
 	TypeJson      = "application/json"
 	TypeUrlEncode = "application/x-www-form-urlencoded"
 	TypeMultipart = "multipart/form-data"
+	TypeText = "text/plain"
 
 	MethodGET    = "GET"
 	MethodPOST   = "POST"
@@ -63,6 +64,8 @@ func (api *Api) Do() error {
 		err = api.urlEncodeProcess()
 	case TypeMultipart:
 		err = api.multipartProcess()
+	case TypeText:
+		err = api.textProcess()
 	default:
 		err = errors.New(api.ContentType + " doesn't support")
 	}
@@ -258,6 +261,16 @@ func (api *Api) multipartProcess() error {
 	api.req, err = http.NewRequest(api.Method, api.Url, payload)
 	api.req.Header.Set("Content-Type", param.FormDataContentType())
 
+	return err
+}
+
+func (api *Api) textProcess() error {
+	if api.Body == nil {
+		api.req, err = http.NewRequest(api.Method, api.Url, nil)
+	} else {
+		reader := strings.NewReader(api.Body)
+		api.req, err = http.NewRequest(api.Method, api.Url, reader)
+	}
 	return err
 }
 
