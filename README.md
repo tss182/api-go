@@ -16,7 +16,7 @@
     	apiCfg.Url = "https://api.github.com/users/tss182/repos"
     
     	// set Conten type
-    	apiCfg.ContentType = api.TypeUrlEncode
+    	apiCfg.ContentType = api.TypeJson
     
     	//set Method
         apiCfg.Method = api.MethodGET
