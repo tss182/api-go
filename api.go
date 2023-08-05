@@ -28,18 +28,19 @@ const (
 )
 
 type Api struct {
-	Url         string
-	ContentType string
-	Method      string
-	header      map[string]string
-	Body        interface{}
-	bodyRaw     interface{}
-	Username    string
-	Password    string
-	BasicAuth   bool
-	result      string
-	Status      int
-	req         *http.Request
+	Url            string
+	ContentType    string
+	Method         string
+	header         map[string]string
+	Body           interface{}
+	bodyRaw        interface{}
+	Username       string
+	Password       string
+	BasicAuth      bool
+	result         string
+	Status         int
+	AddCharInArray bool
+	req            *http.Request
 }
 
 func (api *Api) Do() error {
@@ -153,7 +154,11 @@ func (api *Api) urlEncodeProcess() error {
 					continue
 				}
 				for _, v2 := range v {
-					param.Add(i+"[]", v2)
+					if api.AddCharInArray {
+						param.Add(i+"[]", v2)
+					} else {
+						param.Add(i, v2)
+					}
 				}
 			case int, int8, int16, int32, int64:
 				reflectValue := reflect.ValueOf(v)
@@ -163,7 +168,11 @@ func (api *Api) urlEncodeProcess() error {
 					continue
 				}
 				for _, v2 := range v {
-					param.Add(i+"[]", strconv.Itoa(v2))
+					if api.AddCharInArray {
+						param.Add(i+"[]", strconv.Itoa(v2))
+					} else {
+						param.Add(i, strconv.Itoa(v2))
+					}
 				}
 			case uint, uint8, uint16, uint32, uint64:
 				reflectValue := reflect.ValueOf(v)
@@ -173,7 +182,11 @@ func (api *Api) urlEncodeProcess() error {
 					continue
 				}
 				for _, v2 := range v {
-					param.Add(i+"[]", strconv.Itoa(int(v2)))
+					if api.AddCharInArray {
+						param.Add(i+"[]", strconv.Itoa(int(v2)))
+					} else {
+						param.Add(i, strconv.Itoa(int(v2)))
+					}
 				}
 			case map[string]string:
 				if len(v) == 0 {
@@ -215,21 +228,33 @@ func (api *Api) multipartProcess() error {
 				_ = param.WriteField(i, v)
 			case []string:
 				for _, v2 := range v {
-					_ = param.WriteField(i+"[]", v2)
+					if api.AddCharInArray {
+						_ = param.WriteField(i+"[]", v2)
+					} else {
+						_ = param.WriteField(i, v2)
+					}
 				}
 			case int, int8, int16, int32, int64:
 				reflectValue := reflect.ValueOf(v)
 				_ = param.WriteField(i, strconv.Itoa(int(reflectValue.Int())))
 			case []int:
 				for _, v2 := range v {
-					_ = param.WriteField(i+"[]", strconv.Itoa(v2))
+					if api.AddCharInArray {
+						_ = param.WriteField(i+"[]", strconv.Itoa(v2))
+					} else {
+						_ = param.WriteField(i, strconv.Itoa(v2))
+					}
 				}
 			case uint, uint8, uint16, uint32, uint64:
 				reflectValue := reflect.ValueOf(v)
 				_ = param.WriteField(i, strconv.Itoa(int(reflectValue.Uint())))
 			case []uint:
 				for _, v2 := range v {
-					_ = param.WriteField(i+"[]", strconv.Itoa(int(v2)))
+					if api.AddCharInArray {
+						_ = param.WriteField(i+"[]", strconv.Itoa(int(v2)))
+					} else {
+						_ = param.WriteField(i, strconv.Itoa(int(v2)))
+					}
 				}
 			case map[string]string:
 				for i2, v2 := range v {
@@ -243,9 +268,15 @@ func (api *Api) multipartProcess() error {
 			case []*multipart.FileHeader:
 				for _, v2 := range v {
 					file, _ := v2.Open()
-					f, _ := param.CreateFormFile(i+"[]", v2.Filename)
-					_, _ = io.Copy(f, file)
-					_ = file.Close()
+					if api.AddCharInArray {
+						f, _ := param.CreateFormFile(i+"[]", v2.Filename)
+						_, _ = io.Copy(f, file)
+						_ = file.Close()
+					} else {
+						f, _ := param.CreateFormFile(i, v2.Filename)
+						_, _ = io.Copy(f, file)
+						_ = file.Close()
+					}
 				}
 
 			default:
