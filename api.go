@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"encoding/xml"
 	"errors"
+	"fmt"
 	"io"
 	"mime/multipart"
 	"net/http"
@@ -56,6 +57,10 @@ func (api *Api) Do() error {
 	}
 
 	var err error
+
+	if api.Method == MethodGET && api.ContentType == TypeJson {
+		api.ContentType = TypeUrlEncode
+	}
 
 	//contentType
 	switch api.ContentType {
@@ -201,9 +206,13 @@ func (api *Api) urlEncodeProcess() error {
 			}
 		}
 	}
-
 	if api.Method == MethodGET {
-		api.Url += "?" + param.Encode()
+		char := "?"
+		if strings.Contains(api.Url, "?") {
+			char = "&"
+		}
+		api.Url += char + param.Encode()
+		fmt.Println(api.Url)
 		api.req, err = http.NewRequest(api.Method, api.Url, nil)
 	} else {
 		payload := strings.NewReader(param.Encode())
