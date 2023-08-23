@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"encoding/xml"
 	"errors"
-	"fmt"
 	"io"
 	"mime/multipart"
 	"net/http"
@@ -212,7 +211,6 @@ func (api *Api) urlEncodeProcess() error {
 			char = "&"
 		}
 		api.Url += char + param.Encode()
-		fmt.Println(api.Url)
 		api.req, err = http.NewRequest(api.Method, api.Url, nil)
 	} else {
 		payload := strings.NewReader(param.Encode())
