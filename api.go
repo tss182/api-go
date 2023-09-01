@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"encoding/xml"
 	"errors"
+	"fmt"
 	"io"
 	"mime/multipart"
 	"net/http"
@@ -74,13 +75,13 @@ func (api *Api) Do() error {
 	default:
 		err = errors.New(api.ContentType + " doesn't support")
 	}
+	if err != nil {
+		return err
+	}
+
 	//set content type
 	if api.ContentType != TypeMultipart {
 		api.req.Header.Set("Content-Type", api.ContentType)
-	}
-
-	if err != nil {
-		return err
 	}
 
 	//set basic auth
@@ -192,6 +193,9 @@ func (api *Api) urlEncodeProcess() error {
 						param.Add(i, strconv.Itoa(int(v2)))
 					}
 				}
+			case float32, float64:
+				reflectValue := reflect.ValueOf(v)
+				param.Add(i, fmt.Sprintf("%f", reflectValue.Float()))
 			case map[string]string:
 				if len(v) == 0 {
 					continue
